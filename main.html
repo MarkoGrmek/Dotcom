@@ -1,0 +1,139 @@
+<html>
+
+<head>
+    <title>Naloga</title>
+    <style>body{font-family:"Arial";background-color:#E2E2E1}</style>
+    <style>
+        .bg-color {
+            background-color: green;
+        }
+        .username.ng-valid {
+            background-color: lightgreen;
+        }
+        .username.ng-dirty.ng-invalid-required {
+            background-color: red;
+        }
+        .username.ng-dirty.ng-invalid-minlength {
+            background-color: yellow;
+        }
+
+     
+    </style>
+</head>
+
+
+
+<body>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<div ng-app="myApp" ng-controller="cntrl">
+<form  name="myForm">
+
+ID :     <input type="text" ng-model="id" name="id"> <br/><br/>
+Ime:     <input type="text" ng-model="name" name="name" class="username" placeholder="Vase ime" required ng-minlength="3"/>
+ <span ng-show="myForm.$dirty && myForm.name.$error.required">Nujni vnos</span>
+ <span ng-show="myForm.$dirty && myForm.name.$error.minlength">Dolžina mora biti vsaj 4</span>
+ <span ng-show="myForm.$dirty && myForm.name.$invalid">Neveljaven vnos </span><br/><br/>
+
+
+Naslov: <input type="text" ng-model="naslov" name="naslov"> <br/><br/>
+
+ Datum rojstva <input type="date" id="datum" name="input" ng-model="datum"
+           placeholder="yyyy-MM-dd" min="1900-01-01" max="2020-12-31"  required />
+          
+  
+
+<br/>
+
+<input type="button" value="{{btnName}}" ng-click="insertdata()" ng-disabled="myForm.$invalid" >
+{{msg}}
+
+</form>
+
+
+
+
+<input type="button" value="green" ng-click="myStyle={background:'green'}">
+
+  <div ng-style="myStyle" >
+<tt>dan v tednu = {{datum | date: "EEE"}}</tt><br/>
+
+
+
+
+
+
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Roll No</th>
+		</tr>	
+	</thead>
+	<tbody>
+		<tr ng-repeat="indexdb in data">
+				<td>{{indexdb.Userid}}</td>
+				<td>{{indexdb.username}}</td>
+				<td>{{indexdb.naslov}}</td>
+				<td>{{indexdb.datumR}}</td>
+				<td><button ng-click="deleteUser(indexdb.Userid);">Delete</button></td>
+				<td><button ng-click="editUser(indexdb.Userid, indexdb.username, indexdb.naslov);">Edit</button></td>
+
+		</tr>
+	</tbody>
+</table>
+</div>
+<script>
+var app=angular.module('myApp',[]);
+app.controller('cntrl', function($scope,$http){
+	$scope.obj={'idisable':false};
+	$scope.btnName="Insert";
+
+	$scope.insertdata=function(){
+		$http.post("insert.php",{'id':$scope.id, 'name':$scope.name,'naslov' : $scope.naslov ,'datum':$scope.datum ,'btnName':$scope.btnName})
+		.success(function(){
+			$scope.msg="Data Inserted";
+			$scope.displayUser();
+
+		})
+
+	}
+
+	$scope.displayUser=function(){
+		$http.get("select.php")
+		.success(function(data){
+			$scope.data=data
+		})
+	}
+	$scope.deleteUser=function(userid){
+		$http.post("delete.php",{'id':userid})
+		.success(function(){
+				$scope.msg="Data Deletion successfull";
+				$scope.displayUser();
+
+
+		})
+
+	}
+
+	$scope.editUser=function(userid, username,naslov)
+	{
+		$scope.id=userid;
+		$scope.name=username;
+		$scope.naslov=naslov;
+		$scope.btnName="Update";
+		$scope.obj.idisable=true;
+		$scope.displayUser();
+
+	}
+
+});
+
+
+
+
+
+
+</script>
+</body>
+
+</html>
